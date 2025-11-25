@@ -1,0 +1,15 @@
+[package]
+name = "ntru_cryptoanalysis"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+polynomial-ring = "0.5.1"
+rand = "0.9.2"
+num-traits = "0.2.19"
+rust_xlsxwriter = "0.92.2"
+
+[features]
+default = []
+center-mod = []
+time-measurement = []
