@@ -9,7 +9,9 @@ pub fn ntru_gen_keys (df: u8, dg: u8) -> (PolyXNm1<ModQ>, (Polynomial<Integer>, 
     let (f, fp, fq) = gen_f_fp_fq(df);
     
     let g = gen_polynomial(dg, dg);
-    println!("g = {}", g.to_string());
+    if cfg!(not(feature = "time-measurement")) {
+        println!("g = {}", g.to_string());
+    }
 
     let g = PolyXNm1::from_polynomial(g);
     let h = fq * g;
@@ -20,7 +22,9 @@ pub fn ntru_gen_keys (df: u8, dg: u8) -> (PolyXNm1<ModQ>, (Polynomial<Integer>, 
 #[allow(unused_variables)]
 pub fn ntru_encrypt (dr: u8, h: &PolyXNm1<ModQ>, message: &PolyXNm1<ModQ>) -> PolyXNm1<ModQ> {
     let r = gen_polynomial(dr, dr);
-    println!("r = {}", r.to_string());
+    if cfg!(not(feature = "time-measurement")) {
+        println!("r = {}", r.to_string());
+    }
 
     let r = PolyXNm1::<ModQ>::from_polynomial(r);
     
@@ -51,7 +55,9 @@ fn gen_f_fp_fq (df: u8) -> (Polynomial<Integer>, PolyXNm1<ModP>, PolyXNm1<ModQ>)
     let fq;
     loop {
         f = gen_polynomial(df, df - 1);
-        println!("f = {}", f.to_string());
+        if cfg!(not(feature = "time-measurement")) {
+            println!("f = {}", f.to_string());
+        }
 
         let f_fp = PolyXNm1::<ModP>::from_polynomial(f.clone());
         fp = find_inv_polynomial::<ModP>(&f_fp);
@@ -67,8 +73,11 @@ fn gen_f_fp_fq (df: u8) -> (Polynomial<Integer>, PolyXNm1<ModP>, PolyXNm1<ModQ>)
         }
         fq = f2_to_fq(&f_fq, &f2.unwrap());
 
-        println!("fp = {}", fp.as_mut().unwrap().to_string());
-        println!("fq = {}", fq.to_string());
+        if cfg!(not(feature = "time-measurement")) {
+            println!("fp = {}", fp.as_mut().unwrap().to_string());
+            println!("fq = {}", fq.to_string());
+        }
+
         break;
     }
     (f, fp.unwrap(), fq)

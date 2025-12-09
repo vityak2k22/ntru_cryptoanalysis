@@ -10,6 +10,6 @@ num-traits = "0.2.19"
 rust_xlsxwriter = "0.92.2"
 
 [features]
-default = []
+default = ["time-measurement"]
 center-mod = []
 time-measurement = []
