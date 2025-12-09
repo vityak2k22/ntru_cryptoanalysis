@@ -1,6 +1,6 @@
 use crate::cryptoanalysis::lll::*;
 use crate::polyxnm1::Integer;
-
+//=======================================================================================================================
 pub fn bkz (b: &mut Vec<Vec<Integer>>, beta: usize, delta: Float) {
     let (mut c, mut gs_coeff) = lll(b, delta, false);
 
@@ -34,7 +34,7 @@ pub fn bkz (b: &mut Vec<Vec<Integer>>, beta: usize, delta: Float) {
         }
     }
 }
-
+//=======================================================================================================================
 fn bkz_enum (b: &Vec<Vec<Integer>>, c: &Vec<Float>, gs_coeff: &Vec<Vec<Float>>, j: usize, k: usize) -> (Vec<Integer>, Float, Vec<Integer>) {
     // 1. initialization
     let vec_size = k + 2;
@@ -92,7 +92,7 @@ fn bkz_enum (b: &Vec<Vec<Integer>>, c: &Vec<Float>, gs_coeff: &Vec<Vec<Float>>, 
     let bj_new = sum_ui_bi(&u, b, j, k);
     (u, c_j, bj_new)
 }
-
+//=======================================================================================================================
 fn sum_ui_bi (u: &Vec<Integer>, b: &Vec<Vec<Integer>>, j: usize, k: usize) -> Vec<Integer> {
     let mut result = vec![0 as Integer; b[0].len()];
     for i in j..=k {
@@ -102,3 +102,4 @@ fn sum_ui_bi (u: &Vec<Integer>, b: &Vec<Vec<Integer>>, j: usize, k: usize) -> Ve
     }
     result
 }
+//=======================================================================================================================

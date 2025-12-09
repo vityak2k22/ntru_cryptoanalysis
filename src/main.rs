@@ -2,33 +2,58 @@ mod polyxnm1;
 mod ntru;
 mod cryptoanalysis;
 
+use polyxnm1::PolyXNm1;
+use polyxnm1::UInteger;
 use ntru::*;
 use cryptoanalysis::svp_create_lattice_basis;
+use cryptoanalysis::cvp_create_lattice_basis;
 use cryptoanalysis::bkz::bkz;
-#[cfg(feature = "time-measurement")]
-use rust_xlsxwriter::XlsxError;
 
-use crate::cryptoanalysis::cvp_create_lattice_basis;
-use crate::polyxnm1::{PolyXNm1, UInteger};
+#[cfg(not(feature = "time-measurement"))] use cryptoanalysis::search_potentional_secret_key;
+#[cfg(not(feature = "time-measurement"))] use cryptoanalysis::search_potentional_plaintext;
+#[cfg(not(feature = "time-measurement"))] use polyxnm1::{init_polynomial_ring, zp::*};
 
+#[cfg(feature = "time-measurement")] use rust_xlsxwriter::XlsxError;
+#[cfg(feature = "time-measurement")] use std::time::Duration;
+#[cfg(feature = "time-measurement")] use polyxnm1::init_polynomial_ring;
+#[cfg(feature = "time-measurement")] use polyxnm1::zp::ModQ;
+#[cfg(feature = "time-measurement")] use rust_xlsxwriter::*;
+
+use std::str::FromStr;
+use std::fmt::Debug;
 use std::time::Instant;
-
+use std::io::{self, Write};
+//=======================================================================================================================
 #[cfg(not(feature = "time-measurement"))]
 fn main() {
-    use polyxnm1::{init_polynomial_ring, zp::*};
-    use polynomial_ring::{Polynomial, polynomial};
-    use crate::cryptoanalysis::{search_potentional_secret_key, search_potentional_plaintext};
+    print!("Input n: ");
+    let n: UInteger = stdin_read();
+    
+    print!("Input p: ");
+    let p: UInteger = stdin_read();
 
-    let n: UInteger = 11;
-    let p: UInteger = 3;
-    let q: UInteger = 32;
-    let df = 4u8;
-    let dg = 3u8;
-    let dr = 3u8;
+    print!("Input q: ");
+    let q: UInteger = stdin_read();
+
+    print!("Input df: ");
+    let df: u8 = stdin_read();
+
+    print!("Input dg: ");
+    let dg: u8 = stdin_read();
+
+    print!("Input dr: ");
+    let dr: u8 = stdin_read();
+    
+    // let n: UInteger = 11;
+    // let p: UInteger = 3;
+    // let q: UInteger = 32;
+    // let df = 4u8;
+    // let dg = 3u8;
+    // let dr = 3u8;
 
     init_polynomial_ring(n, p, q);
 
-    let m = polynomial![-1, 0, 0, 1, -1, 0, 0, 0, -1, 1, 1];
+    let m = gen_m();
     println!("message m = {}", m.to_string());
     let m = PolyXNm1::<ModQ>::from_polynomial(m);
 
@@ -97,13 +122,9 @@ fn main() {
     println!("\nPLAINTEXT SEARCHING");
     search_potentional_plaintext(&basis, dr);
 }
-
+//=======================================================================================================================
 #[cfg(feature = "time-measurement")]
 fn main () -> Result<(), XlsxError> {
-    use std::time::Duration;
-    use crate::polyxnm1::init_polynomial_ring;
-    use rust_xlsxwriter::*;
-
     const NUM_COL: u16 = 0;
     const SVP_COL: u16 = 1;
     const CVP_COL: u16 = 2;
@@ -113,13 +134,34 @@ fn main () -> Result<(), XlsxError> {
 
     let bold_format = Format::new().set_bold();
 
-    let count_ex = 10usize;
-    let n: UInteger = 53;
-    let p: UInteger = 3;
-    let q: UInteger = 128;
-    let df = 4u8;
-    let dg = 3u8;
-    let dr = 4u8;
+    print!("Input count_ex: ");
+    let count_ex: usize = stdin_read();
+
+    print!("Input n: ");
+    let n: UInteger = stdin_read();
+    
+    print!("Input p: ");
+    let p: UInteger = stdin_read();
+
+    print!("Input q: ");
+    let q: UInteger = stdin_read();
+
+    print!("Input df: ");
+    let df: u8 = stdin_read();
+
+    print!("Input dg: ");
+    let dg: u8 = stdin_read();
+
+    print!("Input dr: ");
+    let dr: u8 = stdin_read();
+
+    // let count_ex = 10usize;
+    // let n: UInteger = 53;
+    // let p: UInteger = 3;
+    // let q: UInteger = 128;
+    // let df = 4u8;
+    // let dg = 3u8;
+    // let dr = 4u8;
 
     worksheet.write_with_format(0, 0, format!("N = {}, P = {}, Q = {}, count ex = {}", n, p, q, count_ex), &bold_format)?;
     worksheet.write_with_format(1, NUM_COL, "№", &bold_format)?;
@@ -152,6 +194,7 @@ fn main () -> Result<(), XlsxError> {
     println!("SVP ended ({:?})", time_sum);
 
     let m = gen_m();
+    let m = PolyXNm1::<ModQ>::from_polynomial(m);
     let e = ntru_encrypt(dr, &h, &m);
 
     let mut time_sum = Duration::new(0, 0);
@@ -186,3 +229,12 @@ fn main () -> Result<(), XlsxError> {
 
     Ok(())
 }
+//=======================================================================================================================
+fn stdin_read<T: FromStr> () -> T where <T as FromStr>::Err:Debug {
+    io::stdout().flush().unwrap();
+    let mut str = String::new();
+    io::stdin().read_line(&mut str).unwrap();
+    let input_var: T = str.trim().parse().unwrap();
+    input_var
+}
+//=======================================================================================================================

@@ -2,7 +2,7 @@ use crate::polyxnm1::Integer;
 use num_traits::Zero;
 
 pub type Float = f64;
-
+//=======================================================================================================================
 pub fn lll (b: &mut Vec<Vec<Integer>>, delta: Float, mut fc: bool) -> (Vec<Float>, Vec<Vec<Float>>) {
     let n = b[0].len();
 
@@ -77,7 +77,7 @@ pub fn lll (b: &mut Vec<Vec<Integer>>, delta: Float, mut fc: bool) -> (Vec<Float
     }
     (c, gs_coeff)
 }
-
+//=======================================================================================================================
 fn to_float(m: &Vec<Vec<Integer>>) -> Vec<Vec<Float>> {
     let mut result = vec![vec![0 as Float; m[0].len()]; m.len()];
     for i in 0..result.len() {
@@ -87,13 +87,12 @@ fn to_float(m: &Vec<Vec<Integer>>) -> Vec<Vec<Float>> {
     }
     result
 }
-
+//=======================================================================================================================
 #[inline(always)]
 pub fn squared_norm<T: std::ops::Mul<Output = T> + std::ops::AddAssign + Zero + Copy>(v: &Vec<T>) -> T {
     scalar_product::<T>(v, v)
 }
-
-
+//=======================================================================================================================
 fn scalar_product<T: std::ops::Mul<Output = T> + std::ops::AddAssign + Zero + Copy>(a: &Vec<T>, b: &Vec<T>) -> T {
     let mut result: T = T::zero();
     for i in 0..a.len() {
@@ -101,26 +100,26 @@ fn scalar_product<T: std::ops::Mul<Output = T> + std::ops::AddAssign + Zero + Co
     }
     result
 }
-
+//=======================================================================================================================
 fn sub_vec(m: &mut Vec<Vec<Integer>>, index_1: usize, index_2: usize, b_mul: Integer) {
     for i in 0..m[0].len() {
         m[index_1][i] -= b_mul * m[index_2][i];
     }
 }
-
+//=======================================================================================================================
 fn assign_vec_to_float (a: &mut Vec<Float>, b: &Vec<Integer>) {
     for i in 0..a.len() {
         a[i] = b[i] as Float;
     }
 }
-
+//=======================================================================================================================
 #[allow(dead_code)]
 fn assign_vec (v: &mut Vec<Vec<Integer>>, index_1: usize, index_2: usize) {
     for i in 0..v[0].len() {
         v[index_1][i] = v[index_2][i];
     }
 }
-
+//=======================================================================================================================
 fn is_zero(v: &Vec<Integer>) -> bool {
     for i in 0..v.len() {
         if v[i] != 0 {
@@ -129,3 +128,4 @@ fn is_zero(v: &Vec<Integer>) -> bool {
     }
     true
 }
+//=======================================================================================================================

@@ -1,17 +1,15 @@
 use crate::polyxnm1::{Integer, N, PolyXNm1, zp::*};
 use crate::polyxnm1::service::mod_center;
+use crate::polyxnm1::P;
 use polynomial_ring::{Polynomial, polynomial};
-
-#[cfg(feature = "time-measurement") ] use crate::polyxnm1::P;
-#[cfg(feature = "time-measurement") ] use rand::Rng;
+use rand::Rng;
 //=======================================================================================================================
 #[allow(unused_variables)]
 pub fn ntru_gen_keys (df: u8, dg: u8) -> (PolyXNm1<ModQ>, (Polynomial<Integer>, PolyXNm1<ModP>)) {
     let (f, fp, fq) = gen_f_fp_fq(df);
     
     let g = gen_polynomial(dg, dg);
-    //let g = polynomial![-1, 0, 1, 1, 0, 1, 0, 0, -1, 0, -1];
-    //println!("g = {}", g.to_string());
+    println!("g = {}", g.to_string());
 
     let g = PolyXNm1::from_polynomial(g);
     let h = fq * g;
@@ -22,8 +20,7 @@ pub fn ntru_gen_keys (df: u8, dg: u8) -> (PolyXNm1<ModQ>, (Polynomial<Integer>, 
 #[allow(unused_variables)]
 pub fn ntru_encrypt (dr: u8, h: &PolyXNm1<ModQ>, message: &PolyXNm1<ModQ>) -> PolyXNm1<ModQ> {
     let r = gen_polynomial(dr, dr);
-    //let r = polynomial![-1, 0, 1, 1, 1, -1, 0, -1];
-    //println!("r = {}", r.to_string());
+    println!("r = {}", r.to_string());
 
     let r = PolyXNm1::<ModQ>::from_polynomial(r);
     
@@ -54,8 +51,7 @@ fn gen_f_fp_fq (df: u8) -> (Polynomial<Integer>, PolyXNm1<ModP>, PolyXNm1<ModQ>)
     let fq;
     loop {
         f = gen_polynomial(df, df - 1);
-        //f = polynomial![-1, 1, 1, 0, -1, 0, 1, 0, 0, 1, -1];
-        //println!("f = {}", f.to_string());
+        println!("f = {}", f.to_string());
 
         let f_fp = PolyXNm1::<ModP>::from_polynomial(f.clone());
         fp = find_inv_polynomial::<ModP>(&f_fp);
@@ -71,7 +67,8 @@ fn gen_f_fp_fq (df: u8) -> (Polynomial<Integer>, PolyXNm1<ModP>, PolyXNm1<ModQ>)
         }
         fq = f2_to_fq(&f_fq, &f2.unwrap());
 
-        //println!("fp = {}", fp.clone().unwrap().to_string());
+        println!("fp = {}", fp.as_mut().unwrap().to_string());
+        println!("fq = {}", fq.to_string());
         break;
     }
     (f, fp.unwrap(), fq)
@@ -102,8 +99,7 @@ fn gen_polynomial (mut d_pos: u8, mut d_neg: u8) -> Polynomial<Integer> {
     Polynomial::new(polynomial)
 }
 //=======================================================================================================================
-#[cfg(feature = "time-measurement")]
-pub fn gen_m () -> PolyXNm1<ModQ> {
+pub fn gen_m () -> Polynomial<Integer> {
     let n = *N.get().unwrap() as usize;
     let mut m = vec![0 as Integer; n];
 
@@ -113,7 +109,7 @@ pub fn gen_m () -> PolyXNm1<ModQ> {
         m[i] = mod_center(rng.random_range(0..10), *P.get().unwrap());
     }
 
-    PolyXNm1::<ModQ>::from_polynomial(Polynomial::new(m))
+    Polynomial::new(m)
 }
 //=======================================================================================================================
 fn find_inv_polynomial <M: Module> (f: &PolyXNm1<M>) -> Option<PolyXNm1<M>> {
